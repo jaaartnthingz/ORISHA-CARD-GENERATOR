@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAAARTNTHINGZ Orisha Card Generator</title>
+  <style>
+    :root{--gold:#d4af37;--cream:#fff7df;--panel:rgba(255,255,255,.045);--dark:#050505}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Georgia,'Times New Roman',serif;background:radial-gradient(circle at top,#21102d,#050505 45%,#000);color:var(--cream);min-height:100vh;padding:24px}
+    body.lightMode{background:radial-gradient(circle at top,#fff8df,#f1df9d 50%,#d4af37);color:#1a1200}
+    .app{max-width:1280px;margin:auto;border:1px solid rgba(212,175,55,.55);border-radius:24px;padding:24px;background:linear-gradient(135deg,rgba(0,0,0,.94),rgba(23,11,35,.92));box-shadow:0 0 40px rgba(212,175,55,.18)}
+    body.lightMode .app{background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,248,224,.92));box-shadow:0 0 40px rgba(0,0,0,.18)}
+    header{text-align:center;padding:18px 12px 28px;border-bottom:1px solid rgba(212,175,55,.35);margin-bottom:24px}
+    h1{margin:0;color:var(--gold);letter-spacing:2px;font-size:clamp(2rem,5vw,4rem)}
+    .tagline{color:#f6d77a;font-size:1.05rem;margin-top:8px}
+    body.lightMode .tagline{color:#6b4e00}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+    .mini{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .four{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    @media(max-width:900px){.grid,.mini,.four{grid-template-columns:1fr}}
+    .panel{border:1px solid rgba(212,175,55,.35);border-radius:18px;padding:18px;background:var(--panel);margin-bottom:18px}
+    body.lightMode .panel{background:rgba(255,255,255,.68)}
+    label{display:block;color:#f6d77a;margin-bottom:6px;font-weight:bold;letter-spacing:.4px}
+    body.lightMode label,body.lightMode .sectionTitle,body.lightMode .brand{color:#7a5800}
+    input,select,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(212,175,55,.4);background:#0b0b0b;color:var(--cream);font-size:1rem;outline:none}
+    body.lightMode input,body.lightMode select,body.lightMode textarea{background:#fffdf5;color:#1a1200}
+    textarea{min-height:115px;resize:vertical}
+    #promptOutput,#midjourneyOutput{min-height:310px;white-space:pre-wrap;line-height:1.55}
+    .field{margin-bottom:14px}
+    .buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+    button{border:none;border-radius:999px;padding:12px 18px;font-weight:bold;cursor:pointer;color:#080808;background:linear-gradient(135deg,var(--gold),#fff1a8);box-shadow:0 0 18px rgba(212,175,55,.25)}
+    button.secondary{background:linear-gradient(135deg,#fff,#d7d7d7)}
+    button.dark{color:var(--cream);background:linear-gradient(135deg,#171717,#3a2a00);border:1px solid rgba(212,175,55,.5)}
+    .brand{text-align:center;margin-top:28px;color:var(--gold);letter-spacing:1px;font-weight:bold;line-height:1.6}
+    .hint{color:#d9cda8;font-size:.92rem;line-height:1.45;margin-top:6px}
+    body.lightMode .hint{color:#4b3b12}
+    .sectionTitle{color:var(--gold);font-size:1.2rem;margin:0 0 14px;letter-spacing:1px}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <h1>👑 ORISHA CARD GENERATOR</h1>
+    <div class="tagline">JAAARTNTHINGZ Collectible Universe • Card Prompt Builder • Lighting + Foil Engine</div>
+    <div class="buttons" style="justify-content:center;margin-top:16px;"><button class="dark" id="themeBtn" onclick="toggleTheme()">☀️ Bright Background</button></div>
+  </header>
+
+  <section class="panel">
+    <h2 class="sectionTitle">CARD PRESETS</h2>
+    <div class="mini">
+      <div class="field"><label>Collection Type</label><select id="category" onchange="buildPresetMenu()"><option value="orisha">Orisha Cards</option><option value="animal">Sacred & Divine Animal Cards</option><option value="spirit">Sacred Spirits / Realms / Relics</option></select></div>
+      <div class="field"><label>Card Style System</label><select id="cardStyle" onchange="generatePrompt()"></select></div>
+      <div class="field"><label>Choose Preset Card</label><select id="preset" onchange="loadPreset()"></select></div>
+    </div>
+    <div class="hint">Choose a card type, style, and preset. Everything below can still be edited before copying your prompt.</div>
+  </section>
+
+  <section class="panel">
+    <h2 class="sectionTitle">LIGHTING + FOIL ENGINE</h2>
+    <div class="four">
+      <div class="field"><label>Lighting Engine</label><select id="lighting" onchange="generatePrompt()"></select></div>
+      <div class="field"><label>Foil Effect Engine</label><select id="foil" onchange="generatePrompt()"></select></div>
+      <div class="field"><label>Card Frame System</label><select id="frame" onchange="generatePrompt()"></select></div>
+      <div class="field"><label>Art Style Engine</label><select id="artStyle" onchange="generatePrompt()"></select></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="sectionTitle">COLLECTOR FEATURES</h2>
+    <div class="four">
+      <div class="field"><label>Rarity Tier</label><select id="rarityTier" onchange="generatePrompt()"></select></div>
+      <div class="field"><label>Realm / Faction</label><select id="realm" onchange="generatePrompt()"></select></div>
+      <div class="field"><label>Collector Stamp</label><select id="stamp" onchange="generatePrompt()"></select></div>
+      <div class="field"><label>Card Back Style</label><select id="cardBack" onchange="generatePrompt()"></select></div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <h2 class="sectionTitle">CARD DETAILS</h2>
+      <div class="field"><label>Card Name</label><input id="cardName" oninput="generatePrompt()"></div>
+      <div class="field"><label>Title / Role</label><input id="cardTitle" oninput="generatePrompt()"></div>
+      <div class="field"><label>Edition Style</label><select id="edition" onchange="generatePrompt()"></select></div>
+      <div class="field"><label>Color Palette</label><input id="palette" oninput="generatePrompt()"></div>
+      <div class="field"><label>Element</label><input id="element" oninput="generatePrompt()"></div>
+      <div class="field"><label>Collector Number</label><input id="collectorNumber" oninput="generatePrompt()"></div>
+    </div>
+    <div class="panel">
+      <h2 class="sectionTitle">LORE + ABILITIES</h2>
+      <div class="field"><label>Main Visual Description</label><textarea id="visual" oninput="generatePrompt()"></textarea></div>
+      <div class="field"><label>Sacred Symbols</label><textarea id="symbols" oninput="generatePrompt()"></textarea></div>
+      <div class="field"><label>Divine Powers / Card Abilities</label><textarea id="powers" oninput="generatePrompt()"></textarea></div>
+      <div class="field"><label>Card Quote / Lore Line</label><textarea id="quote" oninput="generatePrompt()"></textarea></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="sectionTitle">ADVANCED CARD FEATURES</h2>
+    <div class="grid">
+      <div class="field"><label>Signature Ability</label><input id="signature" oninput="generatePrompt()"></div>
+      <div class="field"><label>Ultimate Move</label><input id="ultimate" oninput="generatePrompt()"></div>
+      <div class="field"><label>Divine Companion Slot</label><input id="companion" oninput="generatePrompt()"></div>
+      <div class="field"><label>Evolution / Ascension Stage</label><input id="evolution" oninput="generatePrompt()"></div>
+    </div>
+  </section>
+
+  <section class="panel output">
+    <label>MASTER DESIGN PROMPT</label>
+    <textarea id="promptOutput" readonly></textarea>
+    <div class="buttons">
+      <button class="secondary" onclick="copyText('promptOutput')">Copy Design Prompt</button>
+      <button class="dark" onclick="randomizePreset()">Random Card</button>
+      <button class="dark" onclick="randomizeEdition()">Random Edition</button>
+      <button class="dark" onclick="randomizeLook()">Random Look</button>
+    </div>
+  </section>
+
+  <section class="panel output">
+    <label>MIDJOURNEY CLEAN PROMPT</label>
+    <textarea id="midjourneyOutput" readonly></textarea>
+    <div class="buttons">
+      <button class="secondary" onclick="copyText('midjourneyOutput')">Copy MidJourney Prompt</button>
+      <button class="dark" onclick="copyFullHTML()">Copy Full HTML</button>
+      <button class="dark" onclick="downloadHTML()">Download HTML</button>
+      <button class="dark" onclick="clearOutput()">Clear Prompt Boxes</button>
+    </div>
+  </section>
+
+  <div class="brand">👑 JAAARTNTHINGZ ™<br>• TikTok | Instagram | Facebook<br>All Rights Reserved</div>
+</main>
+
+<script>
+const cardStyles = ['Holographic Celestial','Black Foil Elite','Luxury Tarot','Ancient Relic','Cyber Afro-Futurist','Dark Fantasy','Cosmic Celestial','Volcanic Titan','Moonwater Oracle','Forest Spirit','Underwater Abyss','Spirit Realm','Glass Prism','Royal Kingdom','Shadow Realm','Ascension Evolution','Anime TCG','Dimensional Portal','Minimal Luxury','Mask & Ritual'];
+const editions = ['Holographic Celestial Edition','Special Edition','Black Foil Edition','Moonwater Edition','Primordial Legend Edition','Forest Spirit Edition','Abyssal Legend Edition','Luxury Tarot Edition','Cosmic Celestial Edition','Ancient Relic Edition','Royal Heart Edition','Treasure Realm Edition','Void Mother Edition','Terra Core Edition','Celestial Rainbow Foil','Black Foil Shadow Gate','Glass Prism Ultra Rare','Cyber Divine Edition','Shadow Realm Variant','Ascension Evolution Edition'];
+const lighting = ['Balanced Medium Cinematic Glow','Bright Luxury Editorial','Soft Celestial Light','Moonlit Mysticism','Volcanic Fire Glow','Abyssal Ocean Glow','Neon Afro-Futurist Glow','Dark Fantasy Shadows With Visible Details','Golden Hour Divine Glow','Storm Lightning Contrast','Forest Sunbeam Glow','Glass Prism Refraction Light'];
+const foil = ['Holographic Rainbow Foil','Black Chrome Foil','Cracked Gold Foil','Glass Prism Foil','Nebula Galaxy Foil','Liquid Metal Foil','Diamond Dust Sparkle','Velvet Matte Black With Gloss Highlights','Spirit Smoke Overlay','Pearl Moon Foil','Bioluminescent Ocean Foil','Emerald Crystal Foil'];
+const frames = ['Royal Gold Frame','Shadow Realm Frame','Crystal Prism Frame','Ancient Temple Frame','Volcanic Frame','Cyber Glyph Frame','Nature Vine Frame','Moonwater Frame','Celestial Galaxy Frame','Obsidian Black Foil Frame','Sacred Relic Frame','Minimal Luxury Frame'];
+const artStyles = ['Hyper-Realistic Cinematic','Glossy Digital Illustration','Anime TCG','Oil Painting Mythic','Comic Book Epic','Airbrush Illustration','Dark Fantasy Realism','Afro-Futurist 3D Render','Watercolor Mythic','Cinematic Matte Painting','Luxury Editorial Poster','Fantasy RPG Card Art'];
+const rarityTiers = ['Common','Rare','Ultra Rare','Secret Rare','Celestial Rare','Black Foil Rare','Mythic Rare','Titan Class','Divine Ascension','Primordial Void','Ancestor Tier','Founders Collection'];
+const realms = ['Ocean Realm','Storm Realm','Sacred Forest','Volcanic Kingdom','Moonwater Realm','Shadow Realm','Celestial Realm','Ancestor Realm','Crossroads Realm','Earth Core Realm','Royal Kingdom Realm','Spirit Gate Realm'];
+const stamps = ['First Edition','Limited Release','Founder Series','Eclipse Collection','Divine Archive','Ancient Relic Pull','Celestial Vault','Shadow Vault','Black Foil Authenticated','Holographic Rare','Sacred Expansion','Collector Proof'];
+const cardBacks = ['Celestial Gold Glyph Back','Black Foil Back','Ancient Relic Back','Sacred Glyph Back','Minimal Luxury Back','Afro-Futurist Circuit Back','Moonwater Back','Forest Vine Back','Volcanic Obsidian Back','Ocean Abyss Back'];
+
+const data = {
+  orisha: [
+    ['OSHUN','Orisha of Love, Beauty & Sweet Waters','Water + Love + Abundance','gold, honey yellow, emerald, black, rainbow holographic foil','gold mirror, cowrie shells, river waves, honey pot, peacock feathers, sunflowers','love, beauty, prosperity, harmony, creativity, emotional healing, sweetness','A radiant divine river queen with glowing golden-brown melanin skin, ornate jeweled crown, golden silk garments, layered jewelry, holding a gold mirror and pouring sweet water from a ceremonial vessel, surrounded by rivers, butterflies, lotus flowers, honey light, and sacred golden mist.','She is sweetness. She is grace. She is love made beautiful.','Honey Mirror Blessing','Golden River Bloom','Sacred Peacock','River Queen Oshun'],
+    ['SHANGO','Orisha of Thunder, Fire & Kingship','Fire + Thunder + Justice','black chrome, molten gold, deep red, fire orange, lightning white','double-headed axe, crown, lightning bolt, fire, drums, red cloth','thunder, fire, justice, courage, leadership, protection, authority','A powerful warrior king with rich melanin skin, muscular regal stance, red and gold royal armor, double-headed axe glowing with lightning, volcanic fire behind him, storm clouds, black lightning cracks, crown energy, and divine masculine authority.','I am the thunder that awakens kings. I am the fire that purifies.','Thunder Judgment','Royal Lightning Strike','Thunder Lion','Thunder King Shango'],
+    ['YEMAYA','Orisha of the Ocean, Motherhood & Protection','Water + Moon + Motherhood','deep blue, pearl white, silver, gold, ocean teal, moonlight','seashell, pearl, moon, wave, dolphin, whale, conch shell','motherhood, protection, healing, intuition, emotional balance, safe passage','A majestic ocean mother rising from moonlit waves with pearl crown, seashell jewelry, flowing blue robes, dolphins and whales in the background, sacred moon halo, glowing water aura, and maternal divine protection.','I am the ocean. Deep, powerful, nurturing and free.','Ocean Mother Shield','Tidal Embrace','Celestial Whale','Ocean Queen Yemaya'],
+    ['OYA','Orisha of Winds, Storms & Transformation','Wind + Lightning + Spirit','purple, violet, black, gold, lightning silver, storm gray','lightning, tornado, peacock feather, sword, spiral, cemetery gate','transformation, courage, wind, storm, ancestral guidance, release, renewal','A fierce storm goddess with flowing purple and black garments, wind-swept hair, lightning aura, tornadoes in the sky, ancestral gateway behind her, peacock feathers, staff, and powerful transformation energy.','When Oya moves, nothing stays the same.','Ancestor Wind','Storm Gate Breaker','Storm Owl','Eclipse Oya'],
+    ['ELEGUA','Guardian of Crossroads & Destiny','Fire + Earth + Spirit','red, black, gold, smoky gray, ember orange','keys, crossroads, doors, candles, staff, road signs, mask','opens paths, removes obstacles, attracts opportunity, protects travelers, fortune','A charismatic crossroads guardian in red and black ceremonial attire, holding keys and a walking staff, standing where multiple glowing roads meet beneath a red moon, surrounded by lanterns, doors, destiny signs, and protective magic.','I open the way. I protect the journey. Destiny is in motion.','Road Opener','Crossroads Shift','Shadow Fox','Crossroads Master Elegua'],
+    ['OGGUN','Orisha of Iron, War & Labor','Iron + Fire + Earth','emerald green, iron gray, molten orange, black, gold','hammer, machete, anvil, chain, forge fire, shield, tools','strength, discipline, protection, labor, victory, endurance, obstacle breaking','A strong forge warrior with hammer and machete, surrounded by sparks, chains, anvils, molten metal, jungle-industrial atmosphere, green and gold jewelry, and focused builder-protector energy.','I am the hammer that shapes the iron.','Iron Will','Forge Breaker','Iron Bull','Forge King Oggun'],
+    ['OBATALA','Father of Wisdom, Peace & Purity','Air + Light + Spirit','white, pearl, silver, soft gold, cloud gray','white dove, pearl, staff, crown, clouds, white cloth, lotus','peace, wisdom, clarity, purity, compassion, balance, truth','A serene elder king in white robes with pearl jewelry, white crown, glowing orb, doves, celestial temple, radiant clouds, peaceful aura, divine clarity, and elevated spiritual wisdom.','I bring peace to the heart, wisdom to the mind, and purity to the soul.','Peace Aura','White Light Balance','Sacred Elephant','Celestial Obatala'],
+    ['BABALU-AYE','Orisha of Healing, Survival & Transformation','Earth + Water + Life Force','earth green, bone white, black, gold, healing emerald','staff, herbs, candles, crutches, healing bowl, earth, sacred beads','healing, endurance, survival, purification, protection, restoration','A powerful healing elder with sacred staff, white healing cloth, green herbs, candles, smoky temple atmosphere, glowing medicine energy in his hand, and survivor transformation power.','I transform pain into power.','Sacred Restoration','Survivor Flame','Healing Dog','Restoration Babalu-Aye'],
+    ['ORUNMILA','Orisha of Wisdom, Knowledge & Destiny','Earth + Spirit + Knowledge','emerald, gold, dark green, candlelight, parchment cream','divination board, cowrie shells, sacred staff, book, eye, candles','wisdom, prophecy, destiny, truth, guidance, clarity, spiritual teaching','A wise diviner elder holding a sacred staff, surrounded by divination tools, glowing symbols, ancient books, candles, green-gold cosmic geometry, and prophetic ancestral wisdom.','I see what others cannot see.','Divine Reading','Hidden Path Reveal','Oracle Falcon','Cosmic Oracle Orunmila'],
+    ['OSHOSI','Orisha of the Hunt, Justice & Prosperity','Earth + Air + Forest','emerald green, forest brown, gold, black, sunlight amber','bow, arrows, forest, paw print, deer, panther, target','precision, protection, prosperity, justice, focus, guidance, provision','A focused divine archer in a sacred forest, drawing a glowing arrow with perfect aim, surrounded by deer, panther, birds, golden forest light, leaves, and protective hunter energy.','I aim with purpose. I move with precision.','Silent Arrow','Justice Shot','Shadow Panther','Emerald Archer Oshosi'],
+    ['NANAN BURUKU','Ancient Mother of Wisdom, Ancestors & Sacred Memory','Earth + Water + Spirit','deep purple, violet, moon silver, black, gold, cosmic rainbow foil','crescent moon, cane staff, mirror, purple flower, owl, spider web','ancestry, wisdom, healing, protection, intuition, transition, hidden truth','A regal ancient grandmother seated in moonlit cosmic waters, wearing purple robes, layered beads, holding a staff and mirror, surrounded by candles, ancestral symbols, purple flowers, spirit smoke, and celestial wisdom.','She is oldest. She remembers. She heals.','Ancestor Memory','Moon Spirit Veil','Spirit Spider','Eternal Matriarch Nanan Buruku'],
+    ['OSAIN','Orisha of Herbs, Healing & Divine Medicine','Earth + Herbs + Spirit','deep green, emerald, gold, forest black, herbal glow','leaves, roots, mortar and pestle, herbal bowl, seeds, flowers','healing, herbal medicine, purification, restoration, protection, nature wisdom','A wise herbal healer covered in sacred leaves, holding a botanical staff, surrounded by herbs, bottles, bowls, candles, glowing green medicine smoke, and ancient forest wisdom.','Through plants, I heal.','Sacred Restoration','Herbal Purification','Spirit Elk','Emerald Osain'],
+    ['AGANJU','Orisha of Volcanoes, Fire & Raw Power','Fire + Earth + Lava','lava orange, crimson, black, molten gold, smoke gray','volcano, lava, axe, sword, shield, fire bowl, lightning','raw power, courage, protection, transformation, leadership, strength','A massive volcanic warrior with shield and blade, standing before erupting lava, molten cracks, fire storms, red cloth, gold armor, and raw transformation energy.','When Aganju rises, obstacles tremble.','Magma Force','Volcanic Wrath','Lava Beast','Molten Titan Aganju'],
+    ['OLOKUN','Orisha of the Deep Ocean & Hidden Mysteries','Water + Mystery + Spirit','deep teal, sapphire, black, silver, gold, bioluminescent blue','trident, conch shell, pearl, cowrie, dolphin, octopus, moon','hidden wealth, emotional depth, ocean protection, sacred secrets, intuition','A regal deep ocean ruler with trident, pearl orb, shell crown, underwater palace, dolphins, jellyfish, treasure, black pearls, cosmic abyss water, and hidden wealth energy.','The deep remembers what the surface forgets.','Abyssal Tide','Ocean Treasury','Abyssal Serpent','Abyssal Olokun'],
+    ['ODUDUWA','Primordial Creator & Ancestor King','Earth + Spirit + Sky','obsidian black, antique gold, smoky bronze, cosmic shadow, hidden rainbow foil','crown, sword, royal staff, ancestor mask, star, spiral, cowrie','creation, rulership, divine order, legacy, kingship, ancestry, destiny','A royal ancestor king in black and gold robes, crowned with cosmic authority, holding a staff, surrounded by sacred architecture, creation symbols, ancestral masks, black foil textures, and primordial divine order.','Before crowns, before kingdoms, before names, there was Oduduwa.','Royal Creation','Primordial Order','Cosmic Crowned Eagle','Void King Oduduwa'],
+    ['YEMBO','Orisha of Still Waters & Sacred Peace','Water + Moon + Peace','silver, pearl, moonlight blue, lavender, holographic aqua, white','full moon, lotus flower, pearl, calabash, dove, silver mirror','peace, emotional healing, rest, serenity, intuition, motherhood','A peaceful divine mother seated in still moonlit waters with lotus flowers, silver mirror, white robes, pearl jewelry, soft waterfalls, glowing moon halo, and calming emotional healing energy.','In still waters, I heal what the world refuses to touch.','Still Water Healing','Moonwater Restoration','Moon Swan','Moonwater Yembo'],
+    ['IBEJI','Divine Twins of Joy & Blessings','Air + Water + Joy','rainbow, gold, hot pink, cobalt blue, cosmic purple, holographic foil','twin hearts, cowrie shell, double drum, rainbow, toy rattle, butterfly','joy, blessings, protection of children, family harmony, creativity','Joyful divine twins in sparkling ceremonial clothing, surrounded by toys, drums, butterflies, rainbow aura, stars, twin hearts, sacred beads, and playful celestial blessings.','Together we remind the world that joy is sacred.','Joy Burst','Twin Harmony','Cosmic Butterflies','Celestial Ibeji'],
+    ['ARONI','Orisha of Sacred Forests & Herbal Secrets','Earth + Forest + Healing','jewel green, emerald, soft gold, forest shadow, balanced bright sunlight','iroko leaf, herbal bowl, snail shell, calabash, roots, sacred tree','herbalism, healing, nature spirits, wisdom, protection, renewal','A forest spirit healer with leaf crown and emerald jewelry, holding a living staff, standing in a lush sacred forest with waterfalls, butterflies, glowing leaves, balanced medium light, and mystical herbal wisdom.','He knows the language of leaves.','Forest Secret','Root Song','Emerald Chameleon','Special Edition Aroni'],
+    ['YEWA','Orisha of Purity, Silence & Sacred Transitions','Moon + Silence + Purity','pearl white, lavender, silver, soft blush, moon blue','white roses, veil, moon, cemetery garden, dove, silver key','purity, silence, mystery, intuition, transitions, spiritual protection','An ethereal veiled divine woman in a moonlit white rose garden, surrounded by silver mist, sacred silence, pearl glow, and soft spiritual mystery.','Silence can be sacred power.','Silent Veil','Moon Rose Passage','Moon Swan','Moon Veil Yewa'],
+    ['LOGUN EDE','Orisha of Wealth, Beauty, Rivers & Hunting','River + Wealth + Precision','turquoise, gold, peacock blue, emerald, white','peacock feather, bow, river jewel, gold crown, fish, mirror','beauty, wealth, duality, elegance, hunting, prosperity, charm','A beautiful royal river hunter with luxurious gold and turquoise attire, peacock-feather accents, bow and arrows, river jewels, and elegant warrior energy.','Beauty and precision can walk together.','Royal Aim','River Jewel Strike','Golden Stag','Royal Opulence Logun Ede'],
+    ['ERINLE','Orisha of Healing, Hunting & Rivers','River + Forest + Medicine','emerald, turquoise, bronze, gold, forest green','river, bow, medicinal plants, fish, antlers, healing arrow','healing, protection, hunting, river guidance, wilderness wisdom','A hunter-healer standing beside an enchanted jungle river with glowing medicinal plants, sacred animals, river mist, emerald water magic, and protective wilderness power.','The river heals what the forest protects.','Healing Arrow','River Medicine','River Stag','Forest Mythic Erinle']
+  ],
+  animal: [
+    ['SACRED PEACOCK','Divine Animal of Oshun','Beauty + Attraction + Prosperity','gold, emerald, rainbow, honey yellow, jewel blue','peacock feather, river, gold mirror, honey drops, sunflowers','charm aura, prosperity blessing, confidence, beauty, divine attraction','A majestic holographic peacock with golden eyes and rainbow feathers standing beside a glowing sacred river with honey-gold mist, jeweled plumage, and Oshun-inspired luxury.','Beauty becomes power when it knows its worth.','Charm Aura','Royal Feather Bloom','Oshun','Ascended Peacock'],
+    ['THUNDER LION','Divine Animal of Shango','Thunder + Fire + Royal Power','molten gold, crimson, black chrome, electric white','lion, lightning, crown, volcano, fire, thunder glyphs','thunder roar, royal intimidation, courage, protection, dominance','A massive celestial lion with a flaming mane, lightning claws, glowing gold eyes, volcanic battlefield, thunderstorm skies, black foil textures, and regal divine power.','Kings tremble when the Thunder Lion roars.','Thunder Roar','Fire Fang Judgment','Shango','Thunder King Beast'],
+    ['STORM OWL','Divine Animal of Oya','Wind + Spirit + Lightning','violet, storm gray, black, silver lightning','owl, storm cloud, feather, lightning, moon eclipse, spiral wind','spirit vision, transformation, storm travel, ancestral guidance, foresight','A massive owl with glowing violet eyes soaring through tornado skies with lightning wings and ancestral storm portals.','The Storm Owl sees what fear tries to hide.','Spirit Vision','Ancestor Wind Flight','Oya','Eclipse Storm Owl'],
+    ['ABYSSAL SERPENT','Divine Animal of Olokun','Ocean + Mystery + Depth','deep ocean blue, abyss black, holographic teal, silver','serpent, pearl, ocean ruins, trident, jellyfish, shell spiral','hypnosis, hidden wisdom, ocean mastery, dream walking, emotional depth','A gigantic bioluminescent serpent beneath cosmic ocean waters, glowing pearl scales, treasure ruins, deep sea temples, and mystical abyssal currents.','The deep speaks through the serpent of forgotten waters.','Depth Pull','Abyssal Hypnosis','Olokun','Void Ocean Serpent'],
+    ['SHADOW PANTHER','Divine Animal of Oshosi','Forest + Stealth + Protection','emerald, black, gold, moonlit green','panther, arrow, forest, paw print, moon, leaves','silent strike, night tracking, protection, precision, stealth','A sleek black panther with emerald glowing eyes moving through a sacred moonlit forest with spirit smoke, golden leaves, and hunter protection energy.','Power moves quietly when purpose is clear.','Silent Strike','Night Tracking','Oshosi','Forest Shadow Panther'],
+    ['SACRED ELEPHANT','Divine Animal of Obatala','Wisdom + Peace + Memory','ivory, pearl, silver, soft gold, cloud white','elephant, pearl armor, dove, cloud, white lotus','peace aura, ancient memory, protection, calm strength, wisdom','A white celestial elephant wearing pearl armor, surrounded by clouds, doves, lotus flowers, moonlight, and Obatala’s peaceful clarity.','Ancient wisdom walks with gentle strength.','Peace Aura','Ancient Memory','Obatala','Ivory Titan Elephant'],
+    ['WORLD TURTLE','Sacred Earth Guardian','Earth + Stability + Creation','earth green, crystal gold, moss, obsidian','turtle shell, mountain, crystal roots, trees, earth glyphs','grounding, endurance, creation, land protection, stability','A colossal ancient turtle carrying glowing forests, mountains, waterfalls, and crystal temples on its back beneath cosmic skies.','The world rests upon sacred patience.','Earth Memory','Terra Shield','Onile','Ancient World Turtle'],
+    ['CELESTIAL DRAGON','Primordial Cosmic Beast','Cosmos + Fire + Spirit','cosmic rainbow, sapphire, violet, black chrome, starlight','dragon, galaxy, star, comet, cosmic flames, prism crystal','cosmic fire, dimensional travel, divine energy, celestial destruction, ascension','A gigantic cosmic dragon flying through galaxies with prism scales, nebula fire breath, glowing stars, celestial armor, and divine cosmic energy.','Stars are born in the wake of the Celestial Dragon.','Cosmic Fire','Dimensional Flame','Orun','Starborn Dragon']
+  ],
+  spirit: [
+    ['SACRED RELIC SHANGO AXE','Relic Card of Thunder Judgment','Thunder + Fire + Justice','red, gold, black, white lightning','double axe, lightning, flame, crown, drum','thunder judgment, king wrath, storm strike, justice power','A legendary double-headed axe floating above volcanic stone, wrapped in lightning, fire, gold carvings, and royal Shango symbols.','The axe does not ask permission to bring truth.','Thunder Judgment','King Wrath','Shango','Relic Awakening'],
+    ['SACRED RELIC OSHUN MIRROR','Relic Card of Beauty & Reflection','Water + Beauty + Truth','gold, honey, emerald, pearl, river blue','gold mirror, river, butterfly, honey, sunflower','reflection, charm, truth reveal, prosperity, self-love','A jeweled golden mirror glowing beside a sacred river with butterflies, honey light, cowrie shells, and Oshun’s divine feminine aura.','The mirror reflects what the soul already knows.','Truth Reflection','Honey Light Reveal','Oshun','Mirror Relic'],
+    ['ANCESTOR PORTAL','Realm Card of Spirit Passage','Spirit + Memory + Portal','indigo, gold, violet, smoke white, black','portal, masks, smoke, candles, stars, ancestral cloth','spirit travel, ancestral guidance, protection, remembrance','A glowing circular ancestral portal surrounded by masks, candles, smoke, gold glyphs, and cosmic spirit energy.','The ancestors do not vanish. They wait at the threshold.','Spirit Passage','Ancestral Gate','Egungun','Portal Ascension'],
+    ['STORM GATE','Realm Card of Oya Transformation','Wind + Lightning + Gateway','purple, black, silver, gold, storm gray','gate, lightning, tornado, key, feather, clouds','transformation, release, awakening, storm crossing, courage','A monumental storm gate opening inside a purple tornado with lightning, gold glyphs, wind spirits, and Oya energy.','Every storm gate opens into becoming.','Storm Gate','Veil Breaker','Oya','Storm Realm'],
+    ['CELESTIAL FOREST','Realm Card of Sacred Nature','Forest + Healing + Spirit','emerald, gold, moss, sky blue, sunlight','trees, roots, fireflies, waterfall, herbs, deer','healing, nature wisdom, renewal, protection, spirit connection','A glowing enchanted forest with giant sacred trees, waterfalls, medicinal plants, fireflies, spirit animals, and emerald sunlight.','The forest keeps what the world forgot.','Forest Blessing','Root Memory','Osain','Sacred Forest Realm'],
+    ['ABYSSAL OCEAN TEMPLE','Realm Card of Hidden Wealth','Ocean + Mystery + Treasure','deep teal, black, silver, pearl, gold','underwater temple, pearls, trident, serpent, treasure','hidden knowledge, emotional depth, wealth, dream wisdom','A massive underwater temple glowing in the deep ocean, surrounded by pearls, sea creatures, treasure, and mysterious blue light.','The deepest waters hold the oldest treasures.','Abyssal Treasury','Deep Realm Unlock','Olokun','Ocean Temple'],
+    ['BLACK FOIL BOOSTER PACK','Product Card of the Shadow Vault','Collector + Mystery + Black Foil','obsidian black, gold, violet, smoky chrome','booster pack, crown seal, foil wrapper, glyphs, mystery glow','mystery pull, rare card reveal, collector energy, premium packaging','A luxury black foil booster pack with JAAARTNTHINGZ crown seal, gold glyphs, holographic wrapper, shadow smoke, and premium collectible packaging.','Open the vault. Pull the power.','Mystery Pull','Shadow Vault Reveal','JAAARTNTHINGZ','Black Foil Booster'],
+    ['CELESTIAL CARD BACK','Card Back Design','Celestial + Glyph + Brand','black, gold, purple, starlight, holographic silver','crown icon, sacred glyphs, stars, gold border, cosmic spiral','brand identity, collectible cohesion, premium card back, luxury finish','A premium trading card back design with centered crown glyph, ornate gold border, cosmic spiral, sacred symbols, and JAAARTNTHINGZ publisher mark.','The back of the card should feel as powerful as the front.','Brand Seal','Celestial Reveal','JAAARTNTHINGZ','Official Card Back']
+  ]
+};
+
+function fillSelect(id, arr){
+  const el = document.getElementById(id);
+  el.innerHTML = arr.map(item => '<option>' + item + '</option>').join('');
+}
+function init(){
+  fillSelect('cardStyle', cardStyles);
+  fillSelect('edition', editions);
+  fillSelect('lighting', lighting);
+  fillSelect('foil', foil);
+  fillSelect('frame', frames);
+  fillSelect('artStyle', artStyles);
+  fillSelect('rarityTier', rarityTiers);
+  fillSelect('realm', realms);
+  fillSelect('stamp', stamps);
+  fillSelect('cardBack', cardBacks);
+  buildPresetMenu();
+}
+function buildPresetMenu(){
+  const cat = document.getElementById('category').value;
+  const preset = document.getElementById('preset');
+  preset.innerHTML = data[cat].map((c,i) => '<option value="' + i + '">' + c[0] + ' — ' + c[1] + '</option>').join('');
+  loadPreset();
+}
+function loadPreset(){
+  const cat = document.getElementById('category').value;
+  const c = data[cat][Number(document.getElementById('preset').value)];
+  set('cardName', c[0]); set('cardTitle', c[1]); set('element', c[2]); set('palette', c[3]);
+  set('symbols', c[4]); set('powers', c[5]); set('visual', c[6]); set('quote', c[7]);
+  set('signature', c[8]); set('ultimate', c[9]); set('companion', c[10]); set('evolution', c[11]);
+  set('collectorNumber', cat === 'animal' ? 'DIVINE ANIMAL CARD 001/333' : cat === 'spirit' ? 'SACRED EXPANSION CARD 001/222' : 'COLLECTOR CARD 001/555');
+  generatePrompt();
+}
+function get(id){return document.getElementById(id).value.trim();}
+function set(id, value){document.getElementById(id).value = value;}
+function cleanText(text){return String(text || '').replace(/::/g,'').replace(/[\r\n]+/g,' ').replace(/\s+/g,' ').trim();}
+function generatePrompt(){
+  const name = get('cardName').toUpperCase();
+  const title = get('cardTitle');
+  const edition = get('edition');
+  const style = get('cardStyle');
+  const palette = get('palette');
+  const element = get('element');
+  const collector = get('collectorNumber');
+  const visual = get('visual');
+  const symbols = get('symbols');
+  const powers = get('powers');
+  const quote = get('quote');
+  const light = get('lighting');
+  const foilFx = get('foil');
+  const frame = get('frame');
+  const art = get('artStyle');
+  const tier = get('rarityTier');
+  const realm = get('realm');
+  const stamp = get('stamp');
+  const back = get('cardBack');
+  const sig = get('signature');
+  const ult = get('ultimate');
+  const comp = get('companion');
+  const evo = get('evolution');
+
+  const designPrompt = [
+    'Create a premium ultra-detailed ' + edition + ' trading card for ' + name + ', ' + title + '.',
+    'Card style system: ' + style + '.',
+    'Art style engine: ' + art + '.',
+    'The card should feel like a luxury Afro-spiritual mythology collectible from the JAAARTNTHINGZ Collectible Universe.',
+    'Main character and scene: ' + visual,
+    'LIGHTING ENGINE: ' + light + '. Keep the subject clearly visible with strong contrast, readable details, dimensional highlights, and no muddy shadows. If the mood is dark, preserve facial clarity, card text clarity, and gold border visibility.',
+    'FOIL EFFECT ENGINE: ' + foilFx + '. Apply reflective premium foil texture, shimmer, embossed accents, collector-grade surface finish, and realistic light-catching metallic detail.',
+    'FRAME SYSTEM: ' + frame + '. Use a premium collectible card border with ornate details, sacred glyphs, layered metallic edges, and clean readable sections.',
+    'Color palette: ' + palette + '.',
+    'Realm or faction: ' + realm + '.',
+    'Element panel: ' + element + '.',
+    'Collector features: rarity tier ' + tier + ', collector number ' + collector + ', collector stamp ' + stamp + ', card back concept ' + back + ', signature ability ' + sig + ', ultimate move ' + ult + ', divine companion slot ' + comp + ', evolution or ascension stage ' + evo + '.',
+    'Card panels to include: large title reading ' + name + ', subtitle reading ' + title + ', card style label reading ' + style + ', edition stamp reading ' + edition + ', rarity seal reading ' + tier + ', collector stamp reading ' + stamp + ', element panel reading ' + element + ', sacred symbols panel listing ' + symbols + ', divine powers panel listing ' + powers + ', signature ability panel reading ' + sig + ', ultimate move panel reading ' + ult + ', companion panel reading ' + comp + ', and a sacred quote panel reading ' + quote + '.',
+    'Branding must be integrated cohesively in the upper-left corner like the approved card style: crown icon and elegant metallic gold JAAARTNTHINGZ branding treatment only, subtle and readable, never covering the main character. Do not include footer or social text inside the image prompt.',
+    'Final style: Afrocentric luxury fantasy, collectible card universe, cinematic spiritual mythology, crisp controlled lighting, premium poster card, visually balanced, print-ready 4:5 vertical composition, 8k detail.'
+  ].join('\n\n');
+
+  const mjPrompt = cleanText([
+    name, title, visual, art, style, light, foilFx, frame,
+    'color palette ' + palette,
+    'sacred symbols ' + symbols,
+    'divine powers ' + powers,
+    'realm ' + realm,
+    'premium Afro-spiritual mythology trading card',
+    'luxury collectible aesthetic',
+    'holographic details',
+    'ornate metallic border',
+    'cinematic composition',
+    'crisp details',
+    'readable card layout',
+    'glossy finish',
+    'dimensional lighting',
+    'balanced contrast',
+    'ultra detailed',
+    '8k'
+  ].filter(Boolean).join(', ')) + ' --ar 4:5 --stylize 750 --chaos 20';
+
+  document.getElementById('promptOutput').value = designPrompt;
+  document.getElementById('midjourneyOutput').value = mjPrompt;
+}
+function copyText(id){
+  const box = document.getElementById(id);
+  box.select(); box.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(box.value);
+}
+function clearOutput(){document.getElementById('promptOutput').value='';document.getElementById('midjourneyOutput').value='';}
+function randomizeEdition(){const s=document.getElementById('edition');s.selectedIndex=Math.floor(Math.random()*s.options.length);generatePrompt();}
+function randomizePreset(){const p=document.getElementById('preset');p.selectedIndex=Math.floor(Math.random()*p.options.length);loadPreset();}
+function rand(id){const s=document.getElementById(id);s.selectedIndex=Math.floor(Math.random()*s.options.length);}
+function randomizeLook(){['cardStyle','lighting','foil','frame','artStyle','rarityTier','realm','stamp','cardBack','edition'].forEach(rand);generatePrompt();}
+function copyFullHTML(){navigator.clipboard.writeText(document.documentElement.outerHTML);}
+function downloadHTML(){
+  const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'JAAARTNTHINGZ-Orisha-Card-Generator.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function toggleTheme(){
+  document.body.classList.toggle('lightMode');
+  const btn = document.getElementById('themeBtn');
+  btn.textContent = document.body.classList.contains('lightMode') ? '🌙 Dark Background' : '☀️ Bright Background';
+}
+init();
+</script>
+</body>
+</html>
